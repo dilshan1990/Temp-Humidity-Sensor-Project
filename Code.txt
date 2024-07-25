@@ -1,0 +1,59 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <DHT.h>
+#include <Adafruit_AHTX0.h>
+
+// LCD settings
+#define LCD_ADDRESS 0x27 // Change this to your LCD's I2C address
+#define LCD_COLUMNS 16
+#define LCD_ROWS 2
+
+// DHT11 settings
+#define DHTPIN 2          // Digital pin connected to the DHT11 sensor
+#define DHTTYPE DHT11    // DHT 11
+
+// Create instances of the libraries
+LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
+DHT dht(DHTPIN, DHTTYPE);
+Adafruit_AHTX0 aht;
+
+void setup() {
+  lcd.init();              // Initialize the LCD
+  lcd.backlight();        // Turn on the backlight
+  
+  dht.begin();            // Initialize the DHT11 sensor
+  if (!aht.begin()) {     // Initialize the AHT10 sensor
+    lcd.setCursor(0, 0);
+    lcd.print("AHT10 not found!");
+    while (1); // Stop the program
+  }
+}
+
+void loop() {
+  // Read humidity from DHT11
+  float dhtHumidity = dht.readHumidity();
+  
+  // Read temperature from AHT10
+  sensors_event_t humidity, temp;
+  aht.getEvent(&humidity, &temp);
+
+  // Check if readings are valid
+  if (isnan(dhtHumidity) || isnan(temp.temperature)) {
+    lcd.setCursor(0, 0);
+    lcd.print("Sensor Error!");
+    return;
+  }
+
+  // Display humidity from DHT11 and temperature from AHT10
+  lcd.setCursor(0, 0);
+  lcd.print("Temp: ");
+  lcd.print(temp.temperature);
+  lcd.print(" C");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Hum: ");
+  lcd.print(dhtHumidity);
+  lcd.print(" %");
+
+  delay(2000); // Wait a few seconds between readings
+}
