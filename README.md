@@ -1,6 +1,3 @@
-Sure, here's a simplified README file for your GitHub repository without the detailed wiring instructions and code:
-
----
 
 # Temp-Humidity-Sensor-Project
 
